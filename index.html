@@ -380,7 +380,7 @@
                         <ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">
                             <li><strong>V<sub>pon</sub></strong>: Objem ponořené části tělesa [m³]</li>
                             <li><strong>&rho;<sub>kap</sub></strong>: Hustota kapaliny [kg/m³]</li>
-                            <li><strong>g</strong>: Gravitační zrychlení [9.81 m/s²]</li>
+                            <li><strong>g</strong>: Tíhové zrychlení [9.81 m/s²]</li>
                         </ul>
                     </div>
 
@@ -586,7 +586,7 @@
             lblObjMass.innerText = `${massKg.toFixed(2)} kg`;
 
             // Výpočet fyzikálních sil
-            const Fg = massKg * g;
+            const FG = massKg * g;
             let Fvz = 0;
             let subVolumeM3 = 0;
             let stateText = "";
@@ -600,7 +600,7 @@
                 behaviorAlert.className = "p-4 rounded-xl text-center font-bold text-base bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
             } else if (Math.abs(objectRho - liquidRho) < 5) {
                 // Vznáší se
-                Fvz = Fg;
+                Fvz = FG;
                 subVolumeM3 = volumeM3;
                 stateText = "VZNÁŠÍ SE";
                 behaviorAlert.innerText = "Těleso se VZNÁŠÍ v kapalině";
@@ -741,10 +741,10 @@
             const centerY = y + blockSize / 2;
 
             // Velikost šipek odpovídá reálným silám
-            const Fg = physicsState.mass * g;
+            const FG = physicsState.mass * g;
             let Fvz = 0;
             if (physicsState.objectDensity < physicsState.liquidDensity) {
-                Fvz = Fg;
+                Fvz = FG;
             } else {
                 Fvz = (physicsState.volume / 1000) * physicsState.liquidDensity * g;
             }
@@ -752,12 +752,12 @@
             const scale = 5.5; // Koeficient pro zvětšení šipek na displeji
 
             // Gravitační šipka (Dolů - červená)
-            const fgLength = Fg * scale;
+            const fgLength = FG * scale;
             if (fgLength > 0) {
                 drawArrow(centerX, centerY, centerX, centerY + fgLength, '#f43f5e', 4);
                 ctx.fillStyle = '#f43f5e';
                 ctx.font = 'bold 12px sans-serif';
-                ctx.fillText(`Fg`, centerX + 10, centerY + fgLength - 5);
+                ctx.fillText(`FG`, centerX + 10, centerY + fgLength - 5);
             }
 
             // Vztlaková šipka (Nahoru - zelená)
