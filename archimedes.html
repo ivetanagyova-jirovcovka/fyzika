@@ -55,7 +55,7 @@
             <div class="flex items-center space-x-3">
                 <div class="bg-brand-500/10 p-2 rounded-xl border border-brand-500/30 text-brand-500">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-.621-.806m0 0a6 6 0 010-8.498m12.54 12.54a2 2 0 01-.621-.806m0 0a6 6 0 010-8.498m-9.879 7.698l1.498-1.498m0 0a2 2 0 010-2.828m0 2.828l-1.498-1.498"></path>
                     </svg>
                 </div>
                 <div>
@@ -103,9 +103,15 @@
                                 <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-brand-400 border border-slate-700" id="liquid-density-badge">1000 kg/m³</span>
                             </div>
                             <div class="grid grid-cols-3 gap-2">
-                                <button onclick="setLiquid('water', 1000)" id="liq-btn-water" class="py-2.5 px-3 rounded-xl border text-xs font-bold transition-all border-brand-500/40 bg-brand-500/10 text-brand-400 shadow-md">Voda</button>
-                                <button onclick="setLiquid('oil', 920)" id="liq-btn-oil" class="py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">Olej</button>
-                                <button onclick="setLiquid('honey', 1420)" id="liq-btn-honey" class="py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">Med</button>
+                                <button onclick="setLiquid('water', 1000)" id="liq-btn-water" class="py-2.5 px-3 rounded-xl border text-xs font-bold transition-all border-brand-500/40 bg-brand-500/10 text-brand-400 shadow-md">
+                                    💧 Voda
+                                </button>
+                                <button onclick="setLiquid('oil', 920)" id="liq-btn-oil" class="py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">
+                                    🛢️ Olej
+                                </button>
+                                <button onclick="setLiquid('honey', 1420)" id="liq-btn-honey" class="py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">
+                                    🍯 Med
+                                </button>
                             </div>
                             <!-- Ruční slider pro hustotu kapaliny -->
                             <div class="space-y-2 pt-2">
@@ -113,7 +119,7 @@
                                     <span>Vlastní hustota kapaliny (&rho;<sub>kap</sub>)</span>
                                     <span id="liq-slider-val">1000 kg/m³</span>
                                 </div>
-                                <input type="range" id="liquid-density" min="600" max="2000" step="10" value="1000" oninput="updateSimulation()" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-brand-500">
+                                <input type="range" id="liquid-density" min="600" max="2000" step="10" value="1000" oninput="updateSimulation()" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer">
                             </div>
                         </div>
 
@@ -124,10 +130,18 @@
                                 <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-emerald-400 border border-slate-700" id="object-density-badge">700 kg/m³</span>
                             </div>
                             <div class="grid grid-cols-4 gap-2">
-                                <button onclick="setObject('wood', 700)" id="obj-btn-wood" class="py-2 px-1 rounded-xl border text-xs font-bold transition-all border-emerald-500/40 bg-emerald-500/10 text-emerald-400">Dřevo</button>
-                                <button onclick="setObject('ice', 917)" id="obj-btn-ice" class="py-2 px-1 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">Led</button>
-                                <button onclick="setObject('brick', 2000)" id="obj-btn-brick" class="py-2 px-1 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">Cihla</button>
-                                <button onclick="setObject('iron', 7870)" id="obj-btn-iron" class="py-2 px-1 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">Železo</button>
+                                <button onclick="setObject('wood', 700)" id="obj-btn-wood" class="py-2 px-1 rounded-xl border text-xs font-bold transition-all border-emerald-500/40 bg-emerald-500/10 text-emerald-400 shadow-md">
+                                    🪵
+                                </button>
+                                <button onclick="setObject('ice', 917)" id="obj-btn-ice" class="py-2 px-1 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">
+                                    🧊
+                                </button>
+                                <button onclick="setObject('brick', 2000)" id="obj-btn-brick" class="py-2 px-1 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">
+                                    🧱
+                                </button>
+                                <button onclick="setObject('iron', 7870)" id="obj-btn-iron" class="py-2 px-1 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">
+                                    ⚙️
+                                </button>
                             </div>
 
                             <!-- Objem tělesa slider -->
@@ -136,7 +150,7 @@
                                     <span>Objem tělesa (V)</span>
                                     <span id="obj-vol-val">1.00 dm³ (0.001 m³)</span>
                                 </div>
-                                <input type="range" id="object-volume" min="0.2" max="2.0" step="0.05" value="1.0" oninput="updateSimulation()" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                                <input type="range" id="object-volume" min="0.2" max="2.0" step="0.05" value="1.0" oninput="updateSimulation()" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer">
                             </div>
 
                             <!-- Hmotnost tělesa slider -->
@@ -145,7 +159,7 @@
                                     <span>Hmotnost tělesa (m)</span>
                                     <span id="obj-mass-val">0.70 kg</span>
                                 </div>
-                                <input type="range" id="object-mass" min="0.1" max="10.0" step="0.05" value="0.7" oninput="updateSimulation('mass')" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                                <input type="range" id="object-mass" min="0.1" max="10.0" step="0.05" value="0.7" oninput="updateSimulation('mass')" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer">
                             </div>
                         </div>
 
@@ -155,7 +169,7 @@
                     <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 backdrop-blur-sm shadow-xl">
                         <h3 class="text-base font-bold text-slate-300 mb-4 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 11h.01M12 7h.01M15 11h.01M12 14h.01M4.017 4.017a9.013 9.013 0 0112.728 0l2.572 2.572m0 0a9.013 9.013 0 010 12.728l-2.572 2.572m0 0a9.013 9.013 0 01-12.728 0L1.445 15.445m0 0A9.013 9.013 0 011.445 2.718l2.572 2.572" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 11h.01M12 7h.01M15 11h.01M12 14h.01M4.017 4.017a9 9 0 1 1 12.73 12.73M4.017 4.017A9 9 0 0 1 12.001 2"></path>
                             </svg>
                             Matematická analýza sil
                         </h3>
@@ -272,7 +286,7 @@
 
                         <!-- Interaktivní zóna výzvy -->
                         <div class="flex flex-wrap gap-3 pt-2">
-                            <button onclick="submergeCrown()" class="px-5 py-2.5 bg-yellow-600 hover:bg-yellow-500 text-white rounded-xl text-xs font-bold transition-all duration-200 shadow-lg shadow-yellow-600/15">
+                            <button onclick="submergeCrown()" class="px-5 py-2.5 bg-yellow-600 hover:bg-yellow-500 text-white rounded-xl text-xs font-bold transition-all duration-200 shadow-lg shadow-yellow-500/30">
                                 Ponořit korunu do vody
                             </button>
                             <button onclick="checkCrownAnswer('fake')" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all duration-200 border border-slate-700">
@@ -305,7 +319,7 @@
                         <h3 class="text-xl font-bold text-slate-100">Udržuj stabilní hloubku</h3>
                         <p class="text-slate-300 text-sm leading-relaxed">
                             Ponorka se nachází v mořské vodě o hustotě <strong>1030 kg/m³</strong>. Má pevný objem <strong>2.00 dm³</strong> (v měřítku simulátoru). <br>
-                            Tvým úkolem je napustit nebo vypustit vodu ze zátěžových komor (měnit její hmotnost) tak, aby nastala **hydrostatická rovnováha** (ponorka se bude vznášet a neklesne ke dnu ani nevypluje na hladinu).
+                            Tvým úkolem je napustit nebo vypustit vodu ze zátěžových komor (měnit její hmotnost) tak, aby nastala **hydrostatická rovnováha** (ponorka se bude vznášet a neklesá).
                         </p>
 
                         <div class="space-y-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
@@ -321,7 +335,7 @@
                             <div class="space-y-1.5">
                                 <label class="text-xs text-slate-400 block">Změnit hmotnost zátěžové vody:</label>
                                 <div class="flex items-center space-x-3">
-                                    <input type="range" id="sub-mass" min="1.5" max="2.5" step="0.01" value="1.7" oninput="updateSubmarine()" class="flex-grow h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                                    <input type="range" id="sub-mass" min="1.5" max="2.5" step="0.01" value="1.7" oninput="updateSubmarine()" class="flex-grow h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer">
                                     <span class="text-xs font-mono font-bold text-slate-200 w-16" id="sub-mass-lbl">1.70 kg</span>
                                 </div>
                             </div>
@@ -585,7 +599,7 @@
             lblObjVol.innerText = `${volumeDm3.toFixed(2)} dm³ (${volumeM3.toFixed(5)} m³)`;
             lblObjMass.innerText = `${massKg.toFixed(2)} kg`;
 
-        // Výpočet fyzikálních sil
+            // Výpočet fyzikálních sil
             const Fg = massKg * g;
             let Fvz = 0;
             let subVolumeM3 = 0;
@@ -613,25 +627,6 @@
                 behaviorAlert.innerText = "Těleso se POTÁPÍ ke dnu";
                 behaviorAlert.className = "p-4 rounded-xl text-center font-bold text-base bg-rose-500/10 text-rose-400 border border-rose-500/20";
             }
-
-            physicsState.displacedVolume = subVolumeM3 * 1000; // Převod zpět na dm³
-
-            // Nastavení výpočtového zobrazení
-            valFgResult.innerText = `${Fg.toFixed(2)} N`;
-            valFgCalcMass.innerText = massKg.toFixed(2);
-            valFgCalcRes.innerText = `${Fg.toFixed(2)} N`;
-
-            valFvzResult.innerText = `${Fvz.toFixed(2)} N`;
-            valFvzCalcV.innerText = subVolumeM3.toFixed(5);
-            valFvzCalcRho.innerText = liquidRho;
-            valFvzCalcRes.innerText = `${Fvz.toFixed(2)} N`;
-
-            // Info panel
-            const subPercent = Math.min(100, Math.round((subVolumeM3 / volumeM3) * 100));
-            infoVSub.innerText = `${(subVolumeM3 * 1000).toFixed(2)} dm³ (${subPercent} %)`;
-            infoRhoObj.innerText = `${Math.round(objectRho)} kg/m³`;
-            infoState.innerText = stateText;
-        }
 
             physicsState.displacedVolume = subVolumeM3 * 1000; // Převod zpět na dm³
 
@@ -840,10 +835,10 @@
             const feedback = document.getElementById('crown-feedback');
             if (choice === 'fake') {
                 feedback.className = "p-3.5 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-                feedback.innerHTML = "🏆 <strong>Správně! Jsi génius!</strong> Zlatník podváděl. Hustota čistého zlata je 19 300 kg/m³, ale tato koruna má pouze 13 043 kg/m³. Zlatník do ní přimíchal stříbro o nízké hustotě a král ho spravedlivě potrestá!";
+                feedback.innerHTML = "🏆 <strong>Správně! Jsi génius!</strong> Zlatník podváděl. Hustota čistého zlata je 19 300 kg/m³, ale tato koruna má pouze 13 043 kg/m³. Zlatník do koruny přidělal stříbro!";
             } else {
                 feedback.className = "p-3.5 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20";
-                feedback.innerHTML = "❌ <strong>Chyba!</strong> Kdyby to bylo čisté zlato, musela by mít koruna hustotu 19 300 kg/m³ a vytlačit pouze 0.077 dm³ vody. Tato koruna vytlačila mnohem více vody, je tedy z lehčího kovu!";
+                feedback.innerHTML = "❌ <strong>Chyba!</strong> Kdyby to bylo čisté zlato, musela by mít koruna hustotu 19 300 kg/m³ a vytlačit pouze 0.077 dm³ vody. Tato koruna vytlačila mnohem více = obsahuje levnější kov!";
             }
         }
 
