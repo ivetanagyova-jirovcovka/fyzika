@@ -585,7 +585,7 @@
             lblObjVol.innerText = `${volumeDm3.toFixed(2)} dm³ (${volumeM3.toFixed(5)} m³)`;
             lblObjMass.innerText = `${massKg.toFixed(2)} kg`;
 
-            // Výpočet fyzikálních sil
+          // Výpočet fyzikálních sil
             const Fg = massKg * g;
             let Fvz = 0;
             let subVolumeM3 = 0;
@@ -600,7 +600,7 @@
                 behaviorAlert.className = "p-4 rounded-xl text-center font-bold text-base bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
             } else if (Math.abs(objectRho - liquidRho) < 5) {
                 // Vznáší se
-                Fvz = FG;
+                Fvz = Fg;
                 subVolumeM3 = volumeM3;
                 stateText = "VZNÁŠÍ SE";
                 behaviorAlert.innerText = "Těleso se VZNÁŠÍ v kapalině";
@@ -613,6 +613,25 @@
                 behaviorAlert.innerText = "Těleso se POTÁPÍ ke dnu";
                 behaviorAlert.className = "p-4 rounded-xl text-center font-bold text-base bg-rose-500/10 text-rose-400 border border-rose-500/20";
             }
+
+            physicsState.displacedVolume = subVolumeM3 * 1000; // Převod zpět na dm³
+
+            // Nastavení výpočtového zobrazení
+            valFgResult.innerText = `${Fg.toFixed(2)} N`;
+            valFgCalcMass.innerText = massKg.toFixed(2);
+            valFgCalcRes.innerText = `${Fg.toFixed(2)} N`;
+
+            valFvzResult.innerText = `${Fvz.toFixed(2)} N`;
+            valFvzCalcV.innerText = subVolumeM3.toFixed(5);
+            valFvzCalcRho.innerText = liquidRho;
+            valFvzCalcRes.innerText = `${Fvz.toFixed(2)} N`;
+
+            // Info panel
+            const subPercent = Math.min(100, Math.round((subVolumeM3 / volumeM3) * 100));
+            infoVSub.innerText = `${(subVolumeM3 * 1000).toFixed(2)} dm³ (${subPercent} %)`;
+            infoRhoObj.innerText = `${Math.round(objectRho)} kg/m³`;
+            infoState.innerText = stateText;
+        }
 
             physicsState.displacedVolume = subVolumeM3 * 1000; // Převod zpět na dm³
 
