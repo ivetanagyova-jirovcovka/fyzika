@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="cs" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archimedův zákon - Interaktivní Laboratoř</title>
+    <!-- Tailwind CSS pro moderní styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts pro moderní typografii -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0f19;
+        }
+        /* Custom scrollbar pro hezčí vzhled */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <!-- NAVIGACE -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-500/10 p-2 rounded-xl border border-brand-500/30 text-brand-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-brand-500 to-emerald-400 bg-clip-text text-transparent">ARCHIMEDES LAB</h1>
+                    <p class="text-xs text-slate-400">Interaktivní fyzikální simulátor</p>
+                </div>
+            </div>
+            
+            <!-- Přepínání záložek -->
+            <nav class="flex space-x-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+                <button onclick="switchTab('sim')" id="tab-sim" class="px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-brand-500 text-white shadow-lg shadow-brand-500/20">
+                    Laboratoř
+                </button>
+                <button onclick="switchTab('challenges')" id="tab-challenges" class="px-4 py-1.5 rounded-lg text-sm font-semibold text-slate-400 hover:text-slate-200 transition-all duration-200">
+                    Mise & Výzvy
+                </button>
+                <button onclick="switchTab('theory')" id="tab-theory" class="px-4 py-1.5 rounded-lg text-sm font-semibold text-slate-400 hover:text-slate-200 transition-all duration-200">
+                    Teorie
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HLAVNÍ OBSAH -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- ================= SEKCE SIMULACE ================= -->
+        <div id="sec-sim" class="space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Ovládací panel (Levá strana) -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 backdrop-blur-sm shadow-xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 rounded-full blur-3xl"></div>
+                        
+                        <h2 class="text-xl font-bold mb-5 flex items-center text-slate-100">
+                            <span class="w-2 h-6 bg-brand-500 rounded-full mr-3"></span>
+                            Nastavení prostředí
+                        </h2>
+
+                        <!-- Kapalina -->
+                        <div class="space-y-4 mb-6">
+                            <div class="flex justify-between items-center">
+                                <label class="text-sm font-medium text-slate-300">Volba kapaliny:</label>
+                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-brand-400 border border-slate-700" id="liquid-density-badge">1000 kg/m³</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="setLiquid('water', 1000)" id="liq-btn-water" class="py-2.5 px-3 rounded-xl border text-xs font-bold transition-all border-brand-500/40 bg-brand-500/10 text-brand-400 shadow-md">Voda</button>
+                                <button onclick="setLiquid('oil', 920)" id="liq-btn-oil" class="py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">Olej</button>
+                                <button onclick="setLiquid('honey', 1420)" id="liq-btn-honey" class="py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">Med</button>
+                            </div>
+                            <!-- Ruční slider pro hustotu kapaliny -->
+                            <div class="space-y-2 pt-2">
+                                <div class="flex justify-between text-xs text-slate-400">
+                                    <span>Vlastní hustota kapaliny (&rho;<sub>kap</sub>)</span>
+                                    <span id="liq-slider-val">1000 kg/m³</span>
+                                </div>
+                                <input type="range" id="liquid-density" min="600" max="2000" step="10" value="1000" oninput="updateSimulation()" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-brand-500">
+                            </div>
+                        </div>
+
+                        <!-- Těleso -->
+                        <div class="space-y-4 pt-4 border-t border-slate-800/60">
+                            <div class="flex justify-between items-center">
+                                <label class="text-sm font-medium text-slate-300">Materiál tělesa:</label>
+                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-emerald-400 border border-slate-700" id="object-density-badge">700 kg/m³</span>
+                            </div>
+                            <div class="grid grid-cols-4 gap-2">
+                                <button onclick="setObject('wood', 700)" id="obj-btn-wood" class="py-2 px-1 rounded-xl border text-xs font-bold transition-all border-emerald-500/40 bg-emerald-500/10 text-emerald-400">Dřevo</button>
+                                <button onclick="setObject('ice', 917)" id="obj-btn-ice" class="py-2 px-1 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">Led</button>
+                                <button onclick="setObject('brick', 2000)" id="obj-btn-brick" class="py-2 px-1 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">Cihla</button>
+                                <button onclick="setObject('iron', 7870)" id="obj-btn-iron" class="py-2 px-1 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700">Železo</button>
+                            </div>
+
+                            <!-- Objem tělesa slider -->
+                            <div class="space-y-2 pt-2">
+                                <div class="flex justify-between text-xs text-slate-400">
+                                    <span>Objem tělesa (V)</span>
+                                    <span id="obj-vol-val">1.00 dm³ (0.001 m³)</span>
+                                </div>
+                                <input type="range" id="object-volume" min="0.2" max="2.0" step="0.05" value="1.0" oninput="updateSimulation()" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                            </div>
+
+                            <!-- Hmotnost tělesa slider -->
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs text-slate-400">
+                                    <span>Hmotnost tělesa (m)</span>
+                                    <span id="obj-mass-val">0.70 kg</span>
+                                </div>
+                                <input type="range" id="object-mass" min="0.1" max="10.0" step="0.05" value="0.7" oninput="updateSimulation('mass')" class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Výpočty pod ovládacím panelem -->
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 backdrop-blur-sm shadow-xl">
+                        <h3 class="text-base font-bold text-slate-300 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 11h.01M12 7h.01M15 11h.01M12 14h.01M4.017 4.017a9.013 9.013 0 0112.728 0l2.572 2.572m0 0a9.013 9.013 0 010 12.728l-2.572 2.572m0 0a9.013 9.013 0 01-12.728 0L1.445 15.445m0 0A9.013 9.013 0 011.445 2.718l2.572 2.572" />
+                            </svg>
+                            Matematická analýza sil
+                        </h3>
+                        
+                        <div class="space-y-4 text-xs sm:text-sm">
+                            <!-- Tíhová síla -->
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <div class="flex justify-between font-bold text-rose-400 mb-1">
+                                    <span>Tíhová síla (F<sub>G</sub>)</span>
+                                    <span id="fg-result">6.87 N</span>
+                                </div>
+                                <p class="text-slate-400 font-mono text-xs">
+                                    F<sub>G</sub> = m &middot; g<br>
+                                    F<sub>G</sub> = <span id="fg-calc-mass">0.70</span> kg &middot; 9.81 m/s² = <strong class="text-slate-200" id="fg-calc-res">6.87 N</strong>
+                                </p>
+                            </div>
+
+                            <!-- Vztlaková síla -->
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+                                <div class="flex justify-between font-bold text-emerald-400 mb-1">
+                                    <span>Vztlaková síla (F<sub>vz</sub>)</span>
+                                    <span id="fvz-result">6.87 N</span>
+                                </div>
+                                <p class="text-slate-400 font-mono text-xs">
+                                    F<sub>vz</sub> = V<sub>pon</sub> &middot; &rho;<sub>kap</sub> &middot; g<br>
+                                    F<sub>vz</sub> = <span id="fvz-calc-v">0.0007</span> m³ &middot; <span id="fvz-calc-rho">1000</span> kg/m³ &middot; 9.81 m/s² = <strong class="text-slate-200" id="fvz-calc-res">6.87 N</strong>
+                                </p>
+                            </div>
+
+                            <!-- Rozhodnutí o chování tělesa -->
+                            <div class="p-4 rounded-xl text-center font-bold text-base transition-all duration-300" id="behavior-alert">
+                                Těleso plave
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vizualizace v reálném čase (Pravá strana) -->
+                <div class="lg:col-span-7 flex flex-col space-y-4">
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 backdrop-blur-sm shadow-xl flex-grow flex flex-col min-h-[480px]">
+                        
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-slate-100 flex items-center">
+                                <span class="w-2 h-6 bg-emerald-500 rounded-full mr-3"></span>
+                                Interaktivní simulátor
+                            </h3>
+                            <div class="flex items-center space-x-2 text-xs text-slate-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                <span>F<sub>vz</sub> (vztlaková)</span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 ml-2"></span>
+                                <span>F<sub>G</sub> (tíhová)</span>
+                            </div>
+                        </div>
+
+                        <!-- Canvas Kontejner -->
+                        <div class="relative flex-grow bg-gradient-to-b from-slate-950 to-slate-900 rounded-2xl border border-slate-800 overflow-hidden flex items-center justify-center">
+                            <canvas id="physics-canvas" class="w-full h-full block cursor-pointer"></canvas>
+
+                            <!-- Informační overlay na canvasu -->
+                            <div class="absolute bottom-4 left-4 right-4 bg-slate-900/90 border border-slate-800 p-3 rounded-xl backdrop-blur-md flex justify-between items-center text-xs">
+                                <div>
+                                    <span class="text-slate-400">Ponořený objem:</span>
+                                    <strong class="text-slate-200 ml-1" id="info-v-sub">0.70 dm³ (70 %)</strong>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400">Hustota tělesa:</span>
+                                    <strong class="text-slate-200 ml-1" id="info-rho-obj">700 kg/m³</strong>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400">Stav:</span>
+                                    <strong class="text-brand-400 ml-1" id="info-state">PLAVE</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= SEKCE MISE & VÝZVY ================= -->
+        <div id="sec-challenges" class="hidden space-y-8">
+            <div class="max-w-4xl mx-auto space-y-6">
+                
+                <div class="text-center space-y-2">
+                    <h2 class="text-3xl font-extrabold bg-gradient-to-r from-brand-400 to-emerald-400 bg-clip-text text-transparent">Fyzikální mise</h2>
+                    <p class="text-slate-400 max-w-lg mx-auto text-sm">Aplikuj své znalosti v reálných výzvách. Dokážeš vyřešit historický rébus nebo správně ovládat ponorku?</p>
+                </div>
+
+                <!-- Výzva 1: Archimédův úkol s korunou -->
+                <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 backdrop-blur-sm shadow-xl grid grid-cols-1 md:grid-cols-12 gap-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-full blur-3xl"></div>
+                    
+                    <div class="md:col-span-8 space-y-4">
+                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/30">Mise 1: Zlatá koruna syrakuského krále</span>
+                        <h3 class="text-xl font-bold text-slate-100">Odhal královského zlatníka!</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Král Hieron II. podezírá zlatníka, že do koruny přimíchal stříbro. <br>
+                            Máš k dispozici korunu o hmotnosti <strong>1.50 kg</strong>. Čisté zlato má hustotu <strong>19 300 kg/m³</strong>, stříbro pouze <strong>10 500 kg/m³</strong>. <br>
+                            Ponoř korunu do vody a sleduj, jaký objem vody vytlačí. Pokud je koruna z čistého zlata, jaký objem vody by měla vytlačit?
+                        </p>
+
+                        <div class="grid grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs">
+                            <div>
+                                <span class="text-slate-400">Naměřený vytlačený objem:</span>
+                                <div class="text-lg font-bold text-yellow-500 mt-1" id="crown-displaced-v">0.115 dm³</div>
+                            </div>
+                            <div>
+                                <span class="text-slate-400">Vypočtená hustota koruny:</span>
+                                <div class="text-lg font-bold text-emerald-400 mt-1" id="crown-calc-density">13 043 kg/m³</div>
+                            </div>
+                        </div>
+
+                        <!-- Interaktivní zóna výzvy -->
+                        <div class="flex flex-wrap gap-3 pt-2">
+                            <button onclick="submergeCrown()" class="px-5 py-2.5 bg-yellow-600 hover:bg-yellow-500 text-white rounded-xl text-xs font-bold transition-all duration-200 shadow-lg shadow-yellow-600/15">
+                                Ponořit korunu do vody
+                            </button>
+                            <button onclick="checkCrownAnswer('fake')" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all duration-200 border border-slate-700">
+                                Je to padělek!
+                            </button>
+                            <button onclick="checkCrownAnswer('pure')" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all duration-200 border border-slate-700">
+                                Je to čisté zlato!
+                            </button>
+                        </div>
+
+                        <!-- Feedback -->
+                        <div id="crown-feedback" class="hidden p-3.5 rounded-xl text-xs font-semibold"></div>
+                    </div>
+
+                    <!-- Pravá vizuální část koruny -->
+                    <div class="md:col-span-4 flex items-center justify-center bg-slate-950 rounded-2xl border border-slate-800 p-4">
+                        <div class="text-center space-y-3">
+                            <div class="text-6xl animate-bounce">👑</div>
+                            <span class="text-xs text-slate-400 block font-mono">Hmotnost m = 1.50 kg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Výzva 2: Ovládání ponorky -->
+                <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 backdrop-blur-sm shadow-xl grid grid-cols-1 md:grid-cols-12 gap-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl"></div>
+                    
+                    <div class="md:col-span-8 space-y-4">
+                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Mise 2: Taktická navigace ponorky</span>
+                        <h3 class="text-xl font-bold text-slate-100">Udržuj stabilní hloubku</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Ponorka se nachází v mořské vodě o hustotě <strong>1030 kg/m³</strong>. Má pevný objem <strong>2.00 dm³</strong> (v měřítku simulátoru). <br>
+                            Tvým úkolem je napustit nebo vypustit vodu ze zátěžových komor (měnit její hmotnost) tak, aby nastala **hydrostatická rovnováha** (ponorka se bude vznášet a neklesne ke dnu ani nevypluje na hladinu).
+                        </p>
+
+                        <div class="space-y-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Hustota mořské vody:</span>
+                                <strong class="text-slate-200">1030 kg/m³</strong>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Aktuální hustota ponorky:</span>
+                                <strong class="text-emerald-400" id="sub-density">850 kg/m³</strong>
+                            </div>
+                            <!-- Ovládání hmotnosti vody v komoře -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs text-slate-400 block">Změnit hmotnost zátěžové vody:</label>
+                                <div class="flex items-center space-x-3">
+                                    <input type="range" id="sub-mass" min="1.5" max="2.5" step="0.01" value="1.7" oninput="updateSubmarine()" class="flex-grow h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                                    <span class="text-xs font-mono font-bold text-slate-200 w-16" id="sub-mass-lbl">1.70 kg</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback -->
+                        <div id="sub-feedback" class="p-3.5 rounded-xl text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                            Ponorka je příliš lehká! Stoupá k hladině. Přidej více vody do komor.
+                        </div>
+                    </div>
+
+                    <!-- Pravá vizuální část ponorky -->
+                    <div class="md:col-span-4 flex items-center justify-center bg-slate-950 rounded-2xl border border-slate-800 p-4 relative overflow-hidden h-48 md:h-auto">
+                        <div id="sub-visual-water" class="absolute bottom-0 left-0 right-0 bg-blue-500/30 transition-all duration-300" style="height: 60%;"></div>
+                        <div class="text-center z-10 space-y-2">
+                            <div class="text-6xl animate-pulse">🛳️</div>
+                            <span class="text-xs text-white bg-slate-900 px-2 py-1 rounded-full border border-slate-800">Komora: <span id="sub-ballast-pct">40%</span></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= SEKCE TEORIE ================= -->
+        <div id="sec-theory" class="hidden space-y-8">
+            <div class="max-w-4xl mx-auto space-y-8">
+                
+                <div class="text-center space-y-2">
+                    <h2 class="text-3xl font-extrabold bg-gradient-to-r from-brand-400 to-emerald-400 bg-clip-text text-transparent">Teoretické minimum</h2>
+                    <p class="text-slate-400 text-sm">Rychle, jasně a vizuálně. Vše, co potřebuješ vědět k písemce nebo zkoušení.</p>
+                </div>
+
+                <!-- Karty s teorií -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Karta 1: Znění zákona -->
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 backdrop-blur-sm shadow-xl space-y-3">
+                        <div class="bg-brand-500/10 text-brand-400 w-10 h-10 rounded-xl flex items-center justify-center border border-brand-500/20 font-bold">1</div>
+                        <h3 class="text-lg font-bold text-slate-100">Znění zákona</h3>
+                        <blockquote class="text-slate-300 text-sm italic border-l-2 border-brand-500 pl-3 leading-relaxed">
+                            "Těleso ponořené do kapaliny je nadlehčováno vztlakovou silou, která se rovná tíze kapaliny tělesem vytlačené."
+                        </blockquote>
+                        <p class="text-xs text-slate-400">
+                            Tento zákon platí nejen pro kapaliny, ale i pro plyny (např. proč létá horkovzdušný balón).
+                        </p>
+                    </div>
+
+                    <!-- Karta 2: Klíčové veličiny a vzorce -->
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 backdrop-blur-sm shadow-xl space-y-3">
+                        <div class="bg-emerald-500/10 text-emerald-400 w-10 h-10 rounded-xl flex items-center justify-center border border-emerald-500/20 font-bold">2</div>
+                        <h3 class="text-lg font-bold text-slate-100">Základní vzorec</h3>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                            <code class="text-emerald-400 font-mono text-lg font-bold">F<sub>vz</sub> = V<sub>pon</sub> &middot; &rho;<sub>kap</sub> &middot; g</code>
+                        </div>
+                        <ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                            <li><strong>V<sub>pon</sub></strong>: Objem ponořené části tělesa [m³]</li>
+                            <li><strong>&rho;<sub>kap</sub></strong>: Hustota kapaliny [kg/m³]</li>
+                            <li><strong>g</strong>: Tíhové zrychlení [9.81 m/s²]</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <!-- Chování těles v kapalině -->
+                <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 backdrop-blur-sm shadow-xl space-y-6">
+                    <h3 class="text-xl font-bold text-slate-100 flex items-center">
+                        <span class="w-2 h-6 bg-brand-500 rounded-full mr-3"></span>
+                        Chování těles podle poměru hustot
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Plave -->
+                        <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800/80 space-y-2 text-center">
+                            <span class="text-3xl">🪵</span>
+                            <h4 class="font-bold text-emerald-400">Plave</h4>
+                            <p class="text-slate-400 text-xs font-mono">&rho;<sub>tělesa</sub> &lt; &rho;<sub>kapaliny</sub></p>
+                            <p class="text-slate-300 text-xs">Vztlaková síla vyrovná gravitační sílu dříve, než se těleso celé ponoří.</p>
+                        </div>
+
+                        <!-- Vznáší se -->
+                        <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800/80 space-y-2 text-center">
+                            <span class="text-3xl">🐟</span>
+                            <h4 class="font-bold text-brand-400">Vznáší se</h4>
+                            <p class="text-slate-400 text-xs font-mono">&rho;<sub>tělesa</sub> = &rho;<sub>kapaliny</sub></p>
+                            <p class="text-slate-300 text-xs">Těleso zůstává v jakékoliv hloubce. Síly jsou v dokonalé rovnováze.</p>
+                        </div>
+
+                        <!-- Potápí se -->
+                        <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800/80 space-y-2 text-center">
+                            <span class="text-3xl">⚓</span>
+                            <h4 class="font-bold text-rose-400">Potápí se</h4>
+                            <p class="text-slate-400 text-xs font-mono">&rho;<sub>tělesa</sub> &gt; &rho;<sub>kapaliny</sub></p>
+                            <p class="text-slate-300 text-xs">Gravitační síla je větší než vztlaková i při úplném ponoření tělesa.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proč železná loď plave? -->
+                <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 backdrop-blur-sm shadow-xl grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                    <div class="md:col-span-8 space-y-3">
+                        <h3 class="text-lg font-bold text-slate-100">💡 Jak je možné, že kovové lodě plavou?</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            I když je ocel mnohem hustší než voda, loď není plný kus oceli. Její vnitřní prostor je vyplněn vzduchem. 
+                            <strong>Průměrná hustota</strong> celého trupu lodi (ocel + vzduch uvnitř) je výrazně nižší než hustota vody. Loď proto bez problému plave!
+                        </p>
+                    </div>
+                    <div class="md:col-span-4 flex justify-center text-6xl py-4 bg-slate-950 rounded-2xl border border-slate-800">
+                        🚢
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-900 bg-slate-950/60 py-6 text-center text-xs text-slate-500">
+        <p>&copy; 2026 Archimedes Lab &bull; Vytvořeno pro moderní fyzikální výuku</p>
+    </footer>
+
+    <!-- LOGIKA SIMULACE (JAVASCRIPT) -->
+    <script>
+        // DOM elementy
+        const canvas = document.getElementById('physics-canvas');
+        const ctx = canvas.getContext('2d');
+
+        const inputLiquidDensity = document.getElementById('liquid-density');
+        const inputObjectVolume = document.getElementById('object-volume');
+        const inputObjectMass = document.getElementById('object-mass');
+
+        const badgeLiquid = document.getElementById('liquid-density-badge');
+        const badgeObject = document.getElementById('object-density-badge');
+
+        const lblLiqSlider = document.getElementById('liq-slider-val');
+        const lblObjVol = document.getElementById('obj-vol-val');
+        const lblObjMass = document.getElementById('obj-mass-val');
+
+        // Výpočty
+        const valFgResult = document.getElementById('fg-result');
+        const valFgCalcMass = document.getElementById('fg-calc-mass');
+        const valFgCalcRes = document.getElementById('fg-calc-res');
+
+        const valFvzResult = document.getElementById('fvz-result');
+        const valFvzCalcV = document.getElementById('fvz-calc-v');
+        const valFvzCalcRho = document.getElementById('fvz-calc-rho');
+        const valFvzCalcRes = document.getElementById('fvz-calc-res');
+
+        const behaviorAlert = document.getElementById('behavior-alert');
+
+        // Info panel
+        const infoVSub = document.getElementById('info-v-sub');
+        const infoRhoObj = document.getElementById('info-rho-obj');
+        const infoState = document.getElementById('info-state');
+
+        // Fyzikální konstanty
+        const g = 9.81;
+
+        // Fyzikální stav tělesa
+        let physicsState = {
+            y: 50,           // Pozice y tělesa na plátně (pixel)
+            velocity: 0,     // Rychlost pádu/stoupání
+            mass: 0.70,      // kg
+            volume: 1.0,     // dm³ (0.001 m³)
+            liquidDensity: 1000, // kg/m³
+            objectDensity: 700,   // kg/m³
+            displacedVolume: 0.70, // Vztlakový objem
+            isDragging: false,
+            dragStartY: 0
+        };
+
+        // Reset velikosti canvasu
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            updateSimulation();
+        });
+
+        // Přepínání záložek
+        function switchTab(tabId) {
+            document.getElementById('sec-sim').classList.add('hidden');
+            document.getElementById('sec-challenges').classList.add('hidden');
+            document.getElementById('sec-theory').classList.add('hidden');
+
+            document.getElementById('tab-sim').className = "px-4 py-1.5 rounded-lg text-sm font-semibold text-slate-400 hover:text-slate-200 transition-all duration-200";
+            document.getElementById('tab-challenges').className = "px-4 py-1.5 rounded-lg text-sm font-semibold text-slate-400 hover:text-slate-200 transition-all duration-200";
+            document.getElementById('tab-theory').className = "px-4 py-1.5 rounded-lg text-sm font-semibold text-slate-400 hover:text-slate-200 transition-all duration-200";
+
+            if (tabId === 'sim') {
+                document.getElementById('sec-sim').classList.remove('hidden');
+                document.getElementById('tab-sim').className = "px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-brand-500 text-white shadow-lg shadow-brand-500/20";
+                resizeCanvas();
+            } else if (tabId === 'challenges') {
+                document.getElementById('sec-challenges').classList.remove('hidden');
+                document.getElementById('tab-challenges').className = "px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-brand-500 text-white shadow-lg shadow-brand-500/20";
+                updateSubmarine();
+            } else if (tabId === 'theory') {
+                document.getElementById('sec-theory').classList.remove('hidden');
+                document.getElementById('tab-theory').className = "px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-brand-500 text-white shadow-lg shadow-brand-500/20";
+            }
+        }
+
+        // Rychlá volba kapaliny
+        function setLiquid(type, density) {
+            // vizuální stav tlačítek
+            ['water', 'oil', 'honey'].forEach(t => {
+                document.getElementById(`liq-btn-${t}`).className = "py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700";
+            });
+            document.getElementById(`liq-btn-${type}`).className = "py-2.5 px-3 rounded-xl border text-xs font-bold transition-all border-brand-500/40 bg-brand-500/10 text-brand-400 shadow-md";
+
+            inputLiquidDensity.value = density;
+            updateSimulation();
+        }
+
+        // Rychlá volba materiálu
+        function setObject(type, density) {
+            ['wood', 'ice', 'brick', 'iron'].forEach(t => {
+                document.getElementById(`obj-btn-${t}`).className = "py-2 px-1 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 text-xs font-bold transition-all hover:border-slate-700";
+            });
+            document.getElementById(`obj-btn-${type}`).className = "py-2 px-1 rounded-xl border text-xs font-bold transition-all border-emerald-500/40 bg-emerald-500/10 text-emerald-400 shadow-md";
+
+            // Upravíme hmotnost na základě objemu a zvolené hustoty: m = V * rho
+            const currentVolumeM3 = parseFloat(inputObjectVolume.value) / 1000;
+            const newMass = currentVolumeM3 * density;
+            inputObjectMass.value = Math.max(0.1, Math.min(10.0, newMass)).toFixed(2);
+
+            updateSimulation();
+        }
+
+        // Aktualizace celé simulace
+        function updateSimulation(changedInput = 'none') {
+            const liquidRho = parseFloat(inputLiquidDensity.value);
+            const volumeDm3 = parseFloat(inputObjectVolume.value);
+            let massKg = parseFloat(inputObjectMass.value);
+
+            // Výpočet hustoty tělesa
+            const volumeM3 = volumeDm3 / 1000;
+            let objectRho = massKg / volumeM3;
+
+            // Pokud uživatel měnil přímo jezdce pro objem, chceme volitelně přepočítat hmotnost, aby odpovídala hustotě vybraného materiálu
+            if (changedInput === 'mass') {
+                // Přepočítáme hustotu na základě nové hmotnosti
+                objectRho = massKg / volumeM3;
+            }
+
+            physicsState.liquidDensity = liquidRho;
+            physicsState.volume = volumeDm3;
+            physicsState.mass = massKg;
+            physicsState.objectDensity = objectRho;
+
+            // Aktualizace labelů
+            badgeLiquid.innerText = `${liquidRho} kg/m³`;
+            badgeObject.innerText = `${Math.round(objectRho)} kg/m³`;
+            lblLiqSlider.innerText = `${liquidRho} kg/m³`;
+            lblObjVol.innerText = `${volumeDm3.toFixed(2)} dm³ (${volumeM3.toFixed(5)} m³)`;
+            lblObjMass.innerText = `${massKg.toFixed(2)} kg`;
+
+          // Výpočet fyzikálních sil
+            const Fg = massKg * g;
+            let Fvz = 0;
+            let subVolumeM3 = 0;
+            let stateText = "";
+
+            if (objectRho < liquidRho) {
+                // Plave
+                Fvz = Fg; // V rovnováze se rovnají
+                subVolumeM3 = Fvz / (liquidRho * g);
+                stateText = "PLAVE";
+                behaviorAlert.innerText = "Těleso PLAVE na hladině";
+                behaviorAlert.className = "p-4 rounded-xl text-center font-bold text-base bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+            } else if (Math.abs(objectRho - liquidRho) < 5) {
+                // Vznáší se
+                Fvz = Fg;
+                subVolumeM3 = volumeM3;
+                stateText = "VZNÁŠÍ SE";
+                behaviorAlert.innerText = "Těleso se VZNÁŠÍ v kapalině";
+                behaviorAlert.className = "p-4 rounded-xl text-center font-bold text-base bg-brand-500/10 text-brand-400 border border-brand-500/20";
+            } else {
+                // Potápí se
+                subVolumeM3 = volumeM3;
+                Fvz = subVolumeM3 * liquidRho * g;
+                stateText = "POTÁPÍ SE";
+                behaviorAlert.innerText = "Těleso se POTÁPÍ ke dnu";
+                behaviorAlert.className = "p-4 rounded-xl text-center font-bold text-base bg-rose-500/10 text-rose-400 border border-rose-500/20";
+            }
+
+            physicsState.displacedVolume = subVolumeM3 * 1000; // Převod zpět na dm³
+
+            // Nastavení výpočtového zobrazení
+            valFgResult.innerText = `${Fg.toFixed(2)} N`;
+            valFgCalcMass.innerText = massKg.toFixed(2);
+            valFgCalcRes.innerText = `${Fg.toFixed(2)} N`;
+
+            valFvzResult.innerText = `${Fvz.toFixed(2)} N`;
+            valFvzCalcV.innerText = subVolumeM3.toFixed(5);
+            valFvzCalcRho.innerText = liquidRho;
+            valFvzCalcRes.innerText = `${Fvz.toFixed(2)} N`;
+
+            // Info panel
+            const subPercent = Math.min(100, Math.round((subVolumeM3 / volumeM3) * 100));
+            infoVSub.innerText = `${(subVolumeM3 * 1000).toFixed(2)} dm³ (${subPercent} %)`;
+            infoRhoObj.innerText = `${Math.round(objectRho)} kg/m³`;
+            infoState.innerText = stateText;
+        }
+
+            physicsState.displacedVolume = subVolumeM3 * 1000; // Převod zpět na dm³
+
+            // Nastavení výpočtového zobrazení
+            valFgResult.innerText = `${Fg.toFixed(2)} N`;
+            valFgCalcMass.innerText = massKg.toFixed(2);
+            valFgCalcRes.innerText = `${Fg.toFixed(2)} N`;
+
+            valFvzResult.innerText = `${Fvz.toFixed(2)} N`;
+            valFvzCalcV.innerText = subVolumeM3.toFixed(5);
+            valFvzCalcRho.innerText = liquidRho;
+            valFvzCalcRes.innerText = `${Fvz.toFixed(2)} N`;
+
+            // Info panel
+            const subPercent = Math.min(100, Math.round((subVolumeM3 / volumeM3) * 100));
+            infoVSub.innerText = `${(subVolumeM3 * 1000).toFixed(2)} dm³ (${subPercent} %)`;
+            infoRhoObj.innerText = `${Math.round(objectRho)} kg/m³`;
+            infoState.innerText = stateText;
+        }
+
+        // Hlavní smyčka vykreslování fyziky (Canvas)
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const tankWidth = canvas.width * 0.7;
+            const tankHeight = canvas.height * 0.75;
+            const tankX = (canvas.width - tankWidth) / 2;
+            const tankY = canvas.height * 0.15;
+
+            // Výpočet výšky hladiny kapaliny podle vytlačené vody
+            // Základní hladina vody bez tělesa je v 55 % výšky nádoby
+            const baseWaterHeight = tankHeight * 0.55;
+            // Vytlačený objem zvedne hladinu
+            const maxDisplacedVolume = 2.0; // Odpovídá maximálnímu slideru
+            const liquidRise = (physicsState.displacedVolume / maxDisplacedVolume) * (tankHeight * 0.1);
+            const waterHeight = baseWaterHeight + liquidRise;
+
+            const waterY = tankY + (tankHeight - waterHeight);
+
+            // Vykreslení Kapaliny (Pozadí vody)
+            let liquidColor = "rgba(14, 165, 233, 0.25)"; // Voda modrá
+            if (physicsState.liquidDensity < 950) {
+                liquidColor = "rgba(234, 179, 8, 0.2)"; // Olej žlutý
+            } else if (physicsState.liquidDensity > 1200) {
+                liquidColor = "rgba(249, 115, 22, 0.3)"; // Med oranžový
+            }
+
+            ctx.fillStyle = liquidColor;
+            ctx.fillRect(tankX, waterY, tankWidth, waterHeight);
+
+            // Nakreslení hladiny (vrchní linka s vlnkami)
+            ctx.strokeStyle = "rgba(14, 165, 233, 0.8)";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(tankX, waterY);
+            ctx.lineTo(tankX + tankWidth, waterY);
+            ctx.stroke();
+
+            // Vykreslení Nádoby (Skleněný obrys)
+            ctx.strokeStyle = "rgba(148, 163, 184, 0.4)";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(tankX, tankY);
+            ctx.lineTo(tankX, tankY + tankHeight);
+            ctx.lineTo(tankX + tankWidth, tankY + tankHeight);
+            ctx.lineTo(tankX + tankWidth, tankY);
+            ctx.stroke();
+
+            // Rozměry tělesa (kostky) na základě objemu
+            // Objem 1.0 dm³ bude reprezentován kostkou o straně ~70px
+            const baseSize = 65;
+            const blockSize = baseSize * Math.cbrt(physicsState.volume);
+
+            const blockX = canvas.width / 2 - blockSize / 2;
+
+            // Výpočet rovnovážné pozice tělesa
+            let targetY = 0;
+            const densityRatio = physicsState.objectDensity / physicsState.liquidDensity;
+
+            if (densityRatio < 1.0) {
+                // Plave - část je nad hladinou
+                const submergedRatio = densityRatio;
+                targetY = waterY - blockSize * (1 - submergedRatio);
+            } else if (Math.abs(densityRatio - 1.0) < 0.01) {
+                // Vznáší se - uprostřed kapaliny
+                targetY = waterY + (tankHeight - waterHeight) / 2 - blockSize / 2;
+            } else {
+                // Potápí se - dno
+                targetY = tankY + tankHeight - blockSize;
+            }
+
+            // Hladký pohyb tělesa k cílové pozici (jednoduchá interpolace/fyzika)
+            const speed = 0.12;
+            physicsState.y += (targetY - physicsState.y) * speed;
+
+            // Nakreslení kostky tělesa
+            const y = physicsState.y;
+            ctx.save();
+            // Efekt materiálu tělesa
+            let blockGrad = ctx.createLinearGradient(blockX, y, blockX + blockSize, y + blockSize);
+            if (physicsState.objectDensity < 800) { // Dřevo
+                blockGrad.addColorStop(0, '#f59e0b');
+                blockGrad.addColorStop(1, '#78350f');
+            } else if (physicsState.objectDensity < 950) { // Led
+                blockGrad.addColorStop(0, '#bae6fd');
+                blockGrad.addColorStop(1, '#0284c7');
+            } else if (physicsState.objectDensity < 2500) { // Cihla
+                blockGrad.addColorStop(0, '#f87171');
+                blockGrad.addColorStop(1, '#991b1b');
+            } else { // Železo / Kov
+                blockGrad.addColorStop(0, '#94a3b8');
+                blockGrad.addColorStop(1, '#334155');
+            }
+
+            ctx.fillStyle = blockGrad;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(blockX, y, blockSize, blockSize, 8);
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+
+            // VYKRESLENÍ SILOVÝCH VEKTORŮ (ŠIPEK)
+            const centerX = blockX + blockSize / 2;
+            const centerY = y + blockSize / 2;
+
+            // Velikost šipek odpovídá reálným silám
+            const FG = physicsState.mass * g;
+            let Fvz = 0;
+            if (physicsState.objectDensity < physicsState.liquidDensity) {
+                Fvz = FG;
+            } else {
+                Fvz = (physicsState.volume / 1000) * physicsState.liquidDensity * g;
+            }
+
+            const scale = 5.5; // Koeficient pro zvětšení šipek na displeji
+
+            // Gravitační šipka (Dolů - červená)
+            const fgLength = FG * scale;
+            if (fgLength > 0) {
+                drawArrow(centerX, centerY, centerX, centerY + fgLength, '#f43f5e', 4);
+                ctx.fillStyle = '#f43f5e';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText(`FG`, centerX + 10, centerY + fgLength - 5);
+            }
+
+            // Vztlaková šipka (Nahoru - zelená)
+            const fvzLength = Fvz * scale;
+            if (fvzLength > 0) {
+                drawArrow(centerX, centerY, centerX, centerY - fvzLength, '#10b981', 4);
+                ctx.fillStyle = '#10b981';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText(`Fvz`, centerX + 10, centerY - fvzLength + 15);
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        // Pomocná funkce pro kreslení šipek
+        function drawArrow(fromx, fromy, tox, toy, color, thickness) {
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = thickness;
+            
+            // Tělo šipky
+            ctx.beginPath();
+            ctx.moveTo(fromx, fromy);
+            ctx.lineTo(tox, toy);
+            ctx.stroke();
+            
+            // Hrot šipky
+            const angle = Math.atan2(toy - fromy, tox - fromx);
+            const headlen = 10;
+            ctx.beginPath();
+            ctx.moveTo(tox, toy);
+            ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+
+        // ================= VÝZVA 1: KORUNA =================
+        let crownSubmerged = false;
+        function submergeCrown() {
+            crownSubmerged = true;
+            document.getElementById('crown-displaced-v').innerText = "0.115 dm³";
+            document.getElementById('crown-calc-density').innerText = "13 043 kg/m³";
+            
+            const feedback = document.getElementById('crown-feedback');
+            feedback.classList.remove('hidden');
+            feedback.className = "p-3.5 rounded-xl text-xs font-semibold bg-brand-500/10 text-brand-400 border border-brand-500/20";
+            feedback.innerHTML = "📊 <strong>Měření dokončeno:</strong> Koruna o hmotnosti 1.50 kg vytlačila 0.115 dm³ vody (0.000115 m³). Hustota je m / V = 13 043 kg/m³.";
+        }
+
+        function checkCrownAnswer(choice) {
+            if (!crownSubmerged) {
+                const feedback = document.getElementById('crown-feedback');
+                feedback.classList.remove('hidden');
+                feedback.className = "p-3.5 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                feedback.innerText = "⚠️ Nejdříve ponoř korunu do vody, abys provedl měření!";
+                return;
+            }
+
+            const feedback = document.getElementById('crown-feedback');
+            if (choice === 'fake') {
+                feedback.className = "p-3.5 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                feedback.innerHTML = "🏆 <strong>Správně! Jsi génius!</strong> Zlatník podváděl. Hustota čistého zlata je 19 300 kg/m³, ale tato koruna má pouze 13 043 kg/m³. Zlatník do ní přimíchal stříbro o nízké hustotě a král ho spravedlivě potrestá!";
+            } else {
+                feedback.className = "p-3.5 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                feedback.innerHTML = "❌ <strong>Chyba!</strong> Kdyby to bylo čisté zlato, musela by mít koruna hustotu 19 300 kg/m³ a vytlačit pouze 0.077 dm³ vody. Tato koruna vytlačila mnohem více vody, je tedy z lehčího kovu!";
+            }
+        }
+
+
+        // ================= VÝZVA 2: PONORKA =================
+        function updateSubmarine() {
+            const subMass = parseFloat(document.getElementById('sub-mass').value);
+            document.getElementById('sub-mass-lbl').innerText = `${subMass.toFixed(2)} kg`;
+
+            const subVolume = 2.0; // Pevný simulovaný objem ponorky v dm³
+            const subDensity = (subMass / (subVolume / 1000));
+            document.getElementById('sub-density').innerText = `${Math.round(subDensity)} kg/m³`;
+
+            // Výpočet procenta naplnění komory vodou (jen vizuální)
+            const ballastPct = Math.round(((subMass - 1.5) / 1.0) * 100);
+            document.getElementById('sub-ballast-pct').innerText = `${ballastPct}%`;
+            document.getElementById('sub-visual-water').style.height = `${ballastPct}%`;
+
+            const targetLiquidDensity = 1030; // Mořská voda
+            const diff = subDensity - targetLiquidDensity;
+            const feedback = document.getElementById('sub-feedback');
+
+            if (Math.abs(diff) < 15) {
+                feedback.className = "p-3.5 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 animate-bounce";
+                feedback.innerHTML = "🏆 <strong>VÝBORNĚ!</strong> Dosáhl jsi dokonalé rovnováhy. Ponorka se vznáší ve stabilní hloubce.";
+            } else if (diff > 0) {
+                feedback.className = "p-3.5 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                feedback.innerHTML = "🚨 <strong>Ponorka se potápí!</strong> Je příliš těžká. Vytlač vodu z komor vzduchem (sniž hmotnost sliderem).";
+            } else {
+                feedback.className = "p-3.5 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20";
+                feedback.innerHTML = "🎈 <strong>Ponorka stoupá k hladině!</strong> Je příliš lehká. Napusť vodu do zátěžových komor (zvyš hmotnost sliderem).";
+            }
+        }
+
+        // Spuštění po načtení
+        window.onload = function() {
+            resizeCanvas();
+            updateSimulation();
+            draw();
+        };
+    </script>
+</body>
+</html>
